@@ -10,6 +10,25 @@ from datetime import date, timedelta
 api = Blueprint('api', __name__)
 
 
+@api.route('/api/boulderworlds/<short_name>/utilizations/current', methods=['GET'])
+def get_boulderworld_utilization_of_now(short_name):
+    assert short_name == request.view_args['short_name']
+    boulderworld = Session.query(Boulderworld) \
+        .filter_by(short_name=short_name).first()
+
+    utilization = Session.query(Utilization) \
+        .filter_by(boulderworld_id=boulderworld.id) \
+        .order_by(Utilization.id.desc()).first()
+
+    utilization_dto = UtilizationDTO(utilization.date_time, utilization.utilization,
+                                     utilization.people_waiting)
+
+    boulderworld_dto = BoulderworldDTO(name=boulderworld.name,
+                                       is_open=boulderworld.is_open,
+                                       utilizations=utilization_dto)
+
+    return jsonify(boulderworld_dto)
+
 @api.route('/api/boulderworlds/<short_name>/utilizations/today', methods=['GET'])
 def get_boulderworld_utilization_of_today(short_name):
     assert short_name == request.view_args['short_name']
