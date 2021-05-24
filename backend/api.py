@@ -1,11 +1,11 @@
-from flask import Blueprint, jsonify, request
-
-from dto import UtilizationDTO, BoulderworldDTO
-from db import Session
-from models import Boulderworld, Utilization
-
-from sqlalchemy import Date, cast
 from datetime import date, timedelta
+
+from flask import Blueprint, jsonify, request
+from sqlalchemy import Date, cast
+
+from db import Session
+from dto import UtilizationDTO, BoulderworldDTO
+from models import Boulderworld, Utilization
 
 api = Blueprint('api', __name__)
 
@@ -20,14 +20,18 @@ def get_boulderworld_utilization_of_now(short_name):
         .filter_by(boulderworld_id=boulderworld.id) \
         .order_by(Utilization.id.desc()).first()
 
-    boulderworld_dto = BoulderworldDTO(name=boulderworld.name,
-                                       is_open=boulderworld.is_open, utilizations=None)
+    if utilization is None:
+        return jsonify(BoulderworldDTO(name=boulderworld.name,
+                                       is_open=boulderworld.is_open,
+                                       utilizations=None))
+    else:
+        return jsonify(BoulderworldDTO(name=boulderworld.name,
+                                       is_open=boulderworld.is_open,
+                                       utilizations=UtilizationDTO(
+                                           utilization.date_time,
+                                           utilization.utilization,
+                                           utilization.people_waiting)))
 
-    if utilization:
-        boulderworld_dto.utilizations = UtilizationDTO(utilization.date_time,
-                utilization.utilization, utilization.people_waiting)
-
-    return jsonify(boulderworld_dto)
 
 @api.route('/api/boulderworlds/<short_name>/utilizations/today', methods=['GET'])
 def get_boulderworld_utilization_of_today(short_name):
