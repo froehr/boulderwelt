@@ -20,12 +20,12 @@ def get_boulderworld_utilization_of_now(short_name):
         .filter_by(boulderworld_id=boulderworld.id) \
         .order_by(Utilization.id.desc()).first()
 
-    utilization_dto = UtilizationDTO(utilization.date_time, utilization.utilization,
-                                     utilization.people_waiting)
-
     boulderworld_dto = BoulderworldDTO(name=boulderworld.name,
-                                       is_open=boulderworld.is_open,
-                                       utilizations=utilization_dto)
+                                       is_open=boulderworld.is_open, utilizations=None)
+
+    if utilization:
+        boulderworld_dto.utilizations = UtilizationDTO(utilization.date_time,
+                utilization.utilization, utilization.people_waiting)
 
     return jsonify(boulderworld_dto)
 
