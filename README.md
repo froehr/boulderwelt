@@ -7,7 +7,7 @@
 
 ## Features
 
-1. Show if yiur Boulderwelt is open right now.
+1. Show if your Boulderwelt is open right now.
 1. Show how high the current utilization is.
 1. Show how many people are currently waiting.
 1. Show a bar-graph of today's utilization since the BW opened. Including color coding of how full
