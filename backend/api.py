@@ -1,7 +1,7 @@
 from datetime import date, timedelta
 
 from flask import Blueprint, jsonify, request
-from sqlalchemy import Date, cast
+from sqlalchemy import Date, cast, exc
 
 from db import Session
 from dto import UtilizationDTO, BoulderworldDTO
@@ -62,10 +62,15 @@ def get_boulderworld_utilization_of_7_days_ago(short_name):
 
 
 def get_utilization_x_days_ago(boulderworld, days_ago):
-    utilizations = Session.query(Utilization) \
-        .filter_by(boulderworld_id=boulderworld.id) \
-        .order_by(Utilization.id.asc()) \
-        .filter(cast(Utilization.date_time, Date) == date.today() - timedelta(days=days_ago))
+    try:
+        utilizations = Session.query(Utilization) \
+            .filter_by(boulderworld_id=boulderworld.id) \
+            .order_by(Utilization.id.asc()) \
+            .filter(cast(Utilization.date_time, Date) == date.today() - timedelta(days=days_ago))
+    except exc.PendingRollbackError:
+        print("Session was stuck and was rolled back.")
+        Session.rollback()
+        raise
 
     utilization_dtos = []
 
