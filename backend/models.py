@@ -18,6 +18,7 @@ class Boulderworld(Base):
     url = Column(String(200))
     short_name = Column(String(10))
     is_open = Column(Boolean)
+    queried_times = Column(Integer)
     utilizations = relationship("Utilization")
 
     id: int
@@ -25,6 +26,7 @@ class Boulderworld(Base):
     url: str
     short_name: str
     is_open: bool
+    queried_times: int
 
 
 @dataclass
