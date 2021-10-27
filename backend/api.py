@@ -20,6 +20,8 @@ def get_boulderworld_utilization_of_now(short_name):
         .filter_by(boulderworld_id=boulderworld.id) \
         .order_by(Utilization.id.desc()).first()
 
+    increment_queried_times(boulderworld)
+
     if utilization is None:
         return jsonify(BoulderworldDTO(name=boulderworld.name,
                                        is_open=boulderworld.is_open,
@@ -75,3 +77,9 @@ def get_utilization_x_days_ago(boulderworld, days_ago):
                                utilization.people_waiting))
 
     return utilization_dtos
+
+
+def increment_queried_times(boulderworld):
+    boulderworld.queried_times += 1
+    Session.add(boulderworld)
+    Session.commit()
